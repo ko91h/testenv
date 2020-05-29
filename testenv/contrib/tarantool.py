@@ -3,6 +3,7 @@
 import contextlib
 import os
 import os.path
+import six
 
 from .. import server, utils
 
@@ -52,7 +53,7 @@ class Tarantool(server.Server):
         cfg = ''
         cfg += "package.path = '{0};' .. package.path\n".format(self.lua_path)
         cfg += "box.cfg({\n"
-        for k, v in self.config.iteritems():
+        for k, v in six.iteritems(self.config):
             cfg += k + ' = '
             if type(v) in (int, float):
                 cfg += str(v)

@@ -7,6 +7,8 @@ import signal
 import socket
 import subprocess
 import time
+import six
+from functools import reduce
 
 import yaml
 
@@ -43,12 +45,12 @@ def free_ip():
 
 def walk(node, code, trail=[]):
     if isinstance(node, dict):
-        for k, v in node.iteritems():
+        for k, v in six.iteritems(node):
             node[k] = walk(v, code, trail + [k])
     elif isinstance(node, (list, tuple)):
         for i, v in enumerate(node):
             node[i] = walk(v, code, trail + [str(i)])
-    elif isinstance(node, basestring):
+    elif isinstance(node, six.string_types):
         node = code(node, trail)
     return node
 
@@ -57,7 +59,7 @@ def merge(*args):
     # args = ( {dict1}, {dict2}, {dict3} )
     def handle(res, node):
         assert type(node) == dict, "merge args should be a dicts"
-        for k, v in node.iteritems():
+        for k, v in six.iteritems(node):
             if k not in res:
                 res[k] = v
             else:
@@ -65,7 +67,7 @@ def merge(*args):
                     res[k] = merge(res[k], v)
                 elif isinstance(v, (list, tuple)):
                     res[k] += v
-                elif isinstance(v, (basestring, int)):
+                elif isinstance(v, six.string_types + (int,)):
                     res[k] = v
         return res
     return reduce(handle, args, {})
@@ -84,10 +86,10 @@ def write_ini(path, ini):
     with contextlib.closing(open(path, "w")) as fh:
         def line(k, v):
             fh.write(str(k) + (v is None and "" or (" = " + str(v))) + "\n")
-        for k, v in ini.iteritems():
+        for k, v in six.iteritems(ini):
             if isinstance(v, dict):
                 fh.write("[" + str(k) + "]\n")
-                for k, v in v.iteritems():
+                for k, v in six.iteritems(v):
                     line(k, v)
             else:
                 line(k, v)

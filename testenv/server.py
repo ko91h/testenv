@@ -5,6 +5,7 @@ import os.path
 import shlex
 import subprocess
 import sys
+import six
 
 from . import utils
 
@@ -34,7 +35,7 @@ class Server(object):
             self.after = [self.after]
 
     def init(self, **kwargs):
-        for k, v in kwargs.iteritems():
+        for k, v in six.iteritems(kwargs):
             setattr(self, k, v)
 
     def confpath(self, path):
@@ -102,8 +103,8 @@ class GenericServer(Server):
     def init(self, **kwargs):
         assert 'command' in kwargs, "command option missed"
         command = kwargs['command']
-        assert isinstance(command, (basestring, list)), "command should be a string or array"
-        if isinstance(command, basestring):
+        assert isinstance(command, six.string_types + (list,)), "command should be a string or array"
+        if isinstance(command, six.string_types):
             command = shlex.split(command)
         binary = utils.find_binary(command[0], cwd=self.runner.confdir)
         assert binary is not None, "Can't find executable for " + command[0]
@@ -116,15 +117,15 @@ class GenericServer(Server):
             assert kwargs['configtype'] in self.CONFIGTYPES, \
                 "configtype {0} is not supported".format(kwargs['configtype'])
         if 'stdout' in kwargs:
-            assert isinstance(kwargs['stdout'], basestring), "stdout option should be a string"
+            assert isinstance(kwargs['stdout'], six.string_types), "stdout option should be a string"
         else:
             kwargs['stdout'] = self.basepath(self.name + '.log')
         if 'stderr' in kwargs:
-            assert isinstance(kwargs['stderr'], basestring), "stderr option should be a string"
+            assert isinstance(kwargs['stderr'], six.string_types), "stderr option should be a string"
         else:
             kwargs['stderr'] = self.basepath(self.name + '.log')
         if 'pidfile' in kwargs:
-            assert isinstance(kwargs['pidfile'], basestring), "pidfile option should be a string"
+            assert isinstance(kwargs['pidfile'], six.string_types), "pidfile option should be a string"
         if 'environ' in kwargs:
             assert isinstance(kwargs['environ'], dict), "environ option should be a dict"
         if 'start_timeout' in kwargs:

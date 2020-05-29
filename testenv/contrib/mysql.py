@@ -3,6 +3,7 @@
 import os
 import os.path
 import re
+import six
 import subprocess
 from distutils.version import LooseVersion
 
@@ -85,6 +86,7 @@ class MySQL(server.Server):
         self.config['mysqld'].setdefault('basedir', self.mysql_basedir)
 
         version = subprocess.check_output([self.mysqld_bin, '--version'])
+        version = version if six.PY2 else version.decode('utf-8')
         match = re.search(r'\d+\.\d+\.\d+', version)
         self.vendor = 'MariaDB' in version and 'MariaDB' or 'MySQL'
         self.version = match.group(0)

@@ -8,6 +8,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import six
 import tempfile
 import traceback
 
@@ -61,7 +62,7 @@ class Runner(object):
         self.config.setdefault('servers', {})
         self.config.setdefault('log', None)
         assert type(self.config['servers']) == dict, "servers section should be a dict"
-        for name, sconf in self.config['servers'].iteritems():
+        for name, sconf in six.iteritems(self.config['servers']):
             assert 'type' in sconf, name + " should have type attribute"
 
     def parametrize_config(self):
@@ -145,7 +146,7 @@ class Runner(object):
             os.makedirs(self.basedir)
 
     def create_servers(self):
-        for name, sconf in self.config['servers'].iteritems():
+        for name, sconf in six.iteritems(self.config['servers']):
             stype = sconf['type']
             if '.' not in stype:
                 stype = 'testenv.contrib.' + stype
